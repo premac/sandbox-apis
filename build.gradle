@@ -1,0 +1,70 @@
+apply plugin: 'base'
+apply plugin: 'java'
+#apply plugin: 'idea'
+
+description = 'Sandobx for playing with Java APIs'
+group = 'com.cloudballs'
+ext {
+	mainClassName = 'com.cloudballs.CloudBalls'
+}
+
+version = 'SNAPSHOT'
+gradle.taskGraph.whenReady {
+	if (project.hasProperty('releaseVersion')) {
+		version = project.getProperty('releaseVersion')
+	}
+}
+
+wrapper.gradleVersion = '1.6'
+
+idea {
+	module {
+		downloadJavadoc = true
+		downloadSources = true
+	}
+}
+
+project.ext {
+	sshtoolsVersion = '0.2.9'
+	powermockVersion = '1.5.1'
+	springVersion = '3.1.2.RELEASE'
+}
+
+dependencies {
+	compile 'com.netledger.megacertify:MegaCertify:+'
+	compile 'org.jsonrest:json:1.0'
+	compile 'log4j:log4j:1.2.17'
+	compile 'commons-cli:commons-cli:1.2'
+	compile 'commons-io:commons-io:2.4'
+	compile 'commons-lang:commons-lang:2.3'
+	compile 'commons-logging:commons-logging:1.1.2'
+	compile "sshtools:j2ssh-core:${sshtoolsVersion}"
+	compile "sshtools:j2ssh-common:${sshtoolsVersion}"
+	compile "sshtools:j2ssh-daemon:${sshtoolsVersion}"
+	compile 'com.jcraft:jsch:0.1.50'
+	compile 'org.json:json:20090211'
+    testCompile 'junit:junit:4.11'
+	testCompile "org.powermock:powermock-module-junit4:${powermockVersion}"
+	testCompile "org.powermock:powermock-api-mockito:${powermockVersion}"
+	testCompile "org.springframework:spring-core:${springVersion}"
+	testCompile "org.springframework:spring-test:${springVersion}"
+}
+
+jar {
+	manifest {
+		attributes 'Main-Class': mainClassName
+	}
+	from('bin') {
+		into 'resources/bin'
+		exclude 'artifacts'
+		exclude 'xmltestresults'
+		exclude 'temp'
+	}
+	from('xml') {
+		into 'resources/xml'
+	}
+}
+
+tasks.withType(Compile) {
+    options.compilerArgs = ['-Xlint:deprecation']
+}
